@@ -9,7 +9,7 @@ export interface PersonalInfo {
   country: string;
   professionalTitle: string;
   profileSummary: string;
-  photo?: string;
+  photo?: File;
 }
 
 export interface Experience {

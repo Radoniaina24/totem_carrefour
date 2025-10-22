@@ -20,9 +20,7 @@ export default function StepPersonalInfo({
   data,
   onNext,
 }: StepPersonalInfoProps) {
-  const [photoPreview, setPhotoPreview] = useState<string | undefined>(
-    data.photo
-  );
+  const [photoPreview, setPhotoPreview] = useState<string | undefined>();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
@@ -38,12 +36,9 @@ export default function StepPersonalInfo({
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setValue("photo", file); // ✅ stocker le fichier
       const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result as string;
-        setPhotoPreview(result);
-        setValue("photo", result);
-      };
+      reader.onloadend = () => setPhotoPreview(reader.result as string);
       reader.readAsDataURL(file);
     }
   };
