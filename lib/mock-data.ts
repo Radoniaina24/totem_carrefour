@@ -1,0 +1,143 @@
+import { PersonalInfo, Experience, Education, Skill, Language } from "./schemas";
+
+export const mockPersonalData: PersonalInfo[] = [
+  {
+    firstName: "Marie",
+    lastName: "Dupont",
+    email: "marie.dupont@email.com",
+    phone: "+33 6 12 34 56 78",
+    address: "45 Avenue des Champs-Élysées",
+    city: "Paris",
+    zipCode: "75008",
+    country: "France",
+    professionalTitle: "Développeuse Full Stack Senior",
+    profileSummary: "Développeuse passionnée avec plus de 8 ans d'expérience dans la création d'applications web modernes. Spécialisée en React, Node.js et architecture cloud. Aime résoudre des problèmes complexes et travailler en équipe.",
+  },
+  {
+    firstName: "Jean",
+    lastName: "Martin",
+    email: "jean.martin@email.com",
+    phone: "+33 6 98 76 54 32",
+    address: "12 Rue de la République",
+    city: "Lyon",
+    zipCode: "69002",
+    country: "France",
+    professionalTitle: "Chef de Projet Digital",
+    profileSummary: "Chef de projet expérimenté avec une expertise en transformation digitale et gestion d'équipes agiles. Plus de 10 ans d'expérience dans le pilotage de projets complexes pour des grands comptes.",
+  },
+  {
+    firstName: "Sophie",
+    lastName: "Bernard",
+    email: "sophie.bernard@email.com",
+    phone: "+33 6 45 67 89 01",
+    address: "78 Boulevard de la Croisette",
+    city: "Cannes",
+    zipCode: "06400",
+    country: "France",
+    professionalTitle: "Designer UX/UI",
+    profileSummary: "Designer créative spécialisée dans la conception d'expériences utilisateur intuitives et engageantes. Passionnée par l'accessibilité et le design thinking. Portfolio primé avec plusieurs projets internationaux.",
+  },
+  {
+    firstName: "Thomas",
+    lastName: "Petit",
+    email: "thomas.petit@email.com",
+    phone: "+33 6 23 45 67 89",
+    address: "34 Rue du Faubourg Saint-Antoine",
+    city: "Paris",
+    zipCode: "75012",
+    country: "France",
+    professionalTitle: "Data Scientist",
+    profileSummary: "Data scientist passionné par l'intelligence artificielle et le machine learning. Expertise en Python, TensorFlow et analyse prédictive. Doctorat en statistiques appliquées avec plusieurs publications scientifiques.",
+  },
+  {
+    firstName: "Émilie",
+    lastName: "Rousseau",
+    email: "emilie.rousseau@email.com",
+    phone: "+33 6 87 65 43 21",
+    address: "56 Cours Mirabeau",
+    city: "Aix-en-Provence",
+    zipCode: "13100",
+    country: "France",
+    professionalTitle: "Product Manager",
+    profileSummary: "Product Manager orientée résultats avec une forte expertise en méthodologies agiles et analyse de marché. Expérience réussie dans le lancement de produits SaaS innovants. Excellentes compétences en communication et leadership.",
+  },
+];
+
+export const mockExperiences: Experience[] = [
+  {
+    jobTitle: "Développeuse Full Stack Senior",
+    company: "TechCorp France",
+    location: "Paris, France",
+    startDate: "2020-01",
+    currentJob: true,
+    description: "Développement d'applications web avec React et Node.js. Lead technique sur plusieurs projets critiques. Mise en place de l'architecture microservices et mentoring des développeurs juniors.",
+  },
+  {
+    jobTitle: "Développeuse Full Stack",
+    company: "Digital Solutions",
+    location: "Lyon, France",
+    startDate: "2016-03",
+    endDate: "2019-12",
+    currentJob: false,
+    description: "Création d'applications e-commerce et systèmes de gestion. Intégration de solutions de paiement et optimisation des performances. Collaboration étroite avec les équipes UX/UI.",
+  },
+  {
+    jobTitle: "Chef de Projet Digital",
+    company: "Innovation Lab",
+    location: "Lyon, France",
+    startDate: "2018-06",
+    currentJob: true,
+    description: "Pilotage de projets de transformation digitale pour des grands comptes. Gestion d'équipes agiles de 8 à 15 personnes. Coordination avec les parties prenantes et optimisation des processus.",
+  },
+];
+
+export const mockEducation: Education[] = [
+  {
+    degree: "Master en Informatique",
+    institution: "École Polytechnique",
+    location: "Paris, France",
+    startDate: "2013-09",
+    endDate: "2015-06",
+    currentStudy: false,
+    description: "Spécialisation en développement web et architecture logicielle. Projet de fin d'études sur les applications temps réel avec Node.js.",
+  },
+  {
+    degree: "Licence en Informatique",
+    institution: "Université Paris-Saclay",
+    location: "Orsay, France",
+    startDate: "2010-09",
+    endDate: "2013-06",
+    currentStudy: false,
+    description: "Formation générale en informatique couvrant programmation, bases de données, réseaux et systèmes d'exploitation.",
+  },
+  {
+    degree: "MBA Digital Marketing",
+    institution: "HEC Paris",
+    location: "Paris, France",
+    startDate: "2023-09",
+    currentStudy: true,
+    description: "Formation en stratégie digitale et management de projets innovants. Focus sur la transformation digitale des entreprises.",
+  },
+];
+
+export const mockSkills: Skill[] = [
+  { name: "React", level: "expert" },
+  { name: "TypeScript", level: "expert" },
+  { name: "Node.js", level: "advanced" },
+  { name: "Next.js", level: "advanced" },
+  { name: "Python", level: "intermediate" },
+  { name: "Docker", level: "advanced" },
+  { name: "AWS", level: "intermediate" },
+  { name: "MongoDB", level: "advanced" },
+  { name: "PostgreSQL", level: "expert" },
+  { name: "Git", level: "expert" },
+  { name: "Figma", level: "advanced" },
+  { name: "Scrum", level: "expert" },
+];
+
+export const mockLanguages: Language[] = [
+  { name: "Français", level: "native" },
+  { name: "Anglais", level: "fluent" },
+  { name: "Espagnol", level: "conversational" },
+  { name: "Allemand", level: "basic" },
+];
