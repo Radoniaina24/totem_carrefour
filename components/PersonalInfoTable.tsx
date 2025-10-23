@@ -2,6 +2,15 @@
 
 import { useState } from "react";
 import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Table,
   TableBody,
   TableCell,
@@ -12,35 +21,44 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Eye, Mail, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
-import { PersonalInfo } from "@/lib/schemas";
+
 import { PersonalInfoDialog } from "./PersonalInfoDialog";
+import { CVData } from "@/lib/types";
 
 interface PersonalInfoTableProps {
-  data: PersonalInfo[];
-  itemsPerPage?: number;
+  data: CVData[];
+  itemsPerPage: number;
+  totalPages: number;
+  currentPage: number;
+  onPageChange: (page: number) => void;
+  onItemsPerPageChange: (items: number) => void;
+  loading: boolean;
 }
-
-export function PersonalInfoTable({ data, itemsPerPage = 5 }: PersonalInfoTableProps) {
-  const [selectedPerson, setSelectedPerson] = useState<PersonalInfo | null>(
-    null
-  );
+export function PersonalInfoTable({
+  data,
+  itemsPerPage = 5,
+  totalPages,
+  currentPage,
+  onItemsPerPageChange,
+  onPageChange,
+  loading,
+}: PersonalInfoTableProps) {
+  const [selectedPerson, setSelectedPerson] = useState<CVData | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const totalPages = Math.ceil(data.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentData = data.slice(startIndex, endIndex);
-
-  const handleViewDetails = (person: PersonalInfo) => {
+  const handleViewDetails = (person: CVData) => {
     setSelectedPerson(person);
     setDialogOpen(true);
   };
-
-  const goToPage = (page: number) => {
-    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+  const handleChange = (value: string) => {
+    const numericValue = Number(value);
+    onItemsPerPageChange(numericValue);
+    console.log("Page size selected:", numericValue);
   };
 
+  const goToPage = (page: number) => {
+    onPageChange(Math.max(1, Math.min(page, totalPages)));
+  };
+  if (loading) return null;
   return (
     <>
       <div className="w-full">
@@ -66,41 +84,47 @@ export function PersonalInfoTable({ data, itemsPerPage = 5 }: PersonalInfoTableP
               </TableRow>
             </TableHeader>
             <TableBody>
-              {currentData.map((person, index) => (
+              {data?.map((person, index) => (
                 <TableRow
                   key={index}
                   className="hover:bg-slate-50 transition-colors"
                 >
                   <TableCell className="font-medium">
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                        {person.firstName.charAt(0)}
-                        {person.lastName.charAt(0)}
+                      <div className="w-10 h-10 text-xs bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold ">
+                        {person.personalInfo.firstName.charAt(0)}
+                        {person.personalInfo.lastName.charAt(0)}
                       </div>
                       <div>
                         <p className="font-semibold text-slate-900">
-                          {person.firstName} {person.lastName}
+                          {person.personalInfo.firstName}{" "}
+                          {person.personalInfo.lastName}
                         </p>
-                        <p className="text-xs text-slate-500">{person.phone}</p>
+                        <p className="text-xs text-slate-500">
+                          {person.personalInfo.phone}
+                        </p>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>
                     <Badge variant="secondary" className="font-normal">
-                      {person.professionalTitle}
+                      {person.personalInfo.professionalTitle}
                     </Badge>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center space-x-2 text-slate-600">
                       <Mail className="w-4 h-4" />
-                      <span className="text-sm">{person.email}</span>
+                      <span className="text-sm">
+                        {person.personalInfo.email}
+                      </span>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center space-x-2 text-slate-600">
                       <MapPin className="w-4 h-4" />
                       <span className="text-sm">
-                        {person.city}, {person.country}
+                        {person.personalInfo.city},{" "}
+                        {person.personalInfo.country}
                       </span>
                     </div>
                   </TableCell>
@@ -122,7 +146,7 @@ export function PersonalInfoTable({ data, itemsPerPage = 5 }: PersonalInfoTableP
         </div>
 
         <div className="lg:hidden space-y-4">
-          {currentData.map((person, index) => (
+          {data.map((person, index) => (
             <div
               key={index}
               className="bg-white rounded-lg border border-slate-200 shadow-sm p-4 space-y-3"
@@ -130,31 +154,34 @@ export function PersonalInfoTable({ data, itemsPerPage = 5 }: PersonalInfoTableP
               <div className="flex items-start justify-between">
                 <div className="flex items-center space-x-3">
                   <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
-                    {person.firstName.charAt(0)}
-                    {person.lastName.charAt(0)}
+                    {person.personalInfo.firstName.charAt(0)}
+                    {person.personalInfo.lastName.charAt(0)}
                   </div>
                   <div>
                     <h3 className="font-semibold text-slate-900">
-                      {person.firstName} {person.lastName}
+                      {person.personalInfo.firstName}{" "}
+                      {person.personalInfo.lastName}
                     </h3>
-                    <p className="text-xs text-slate-500">{person.phone}</p>
+                    <p className="text-xs text-slate-500">
+                      {person.personalInfo.phone}
+                    </p>
                   </div>
                 </div>
               </div>
 
               <Badge variant="secondary" className="font-normal">
-                {person.professionalTitle}
+                {person.personalInfo.professionalTitle}
               </Badge>
 
               <div className="space-y-2">
                 <div className="flex items-center space-x-2 text-slate-600">
                   <Mail className="w-4 h-4" />
-                  <span className="text-sm">{person.email}</span>
+                  <span className="text-sm">{person.personalInfo.email}</span>
                 </div>
                 <div className="flex items-center space-x-2 text-slate-600">
                   <MapPin className="w-4 h-4" />
                   <span className="text-sm">
-                    {person.city}, {person.country}
+                    {person.personalInfo.city}, {person.personalInfo.country}
                   </span>
                 </div>
               </div>
@@ -174,9 +201,19 @@ export function PersonalInfoTable({ data, itemsPerPage = 5 }: PersonalInfoTableP
 
         {totalPages > 1 && (
           <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 px-2">
-            <div className="text-sm text-slate-600">
-              Affichage de {startIndex + 1} à {Math.min(endIndex, data.length)} sur {data.length} profils
-            </div>
+            <Select value={String(itemsPerPage)} onValueChange={handleChange}>
+              <SelectTrigger className="w-[90px]">
+                <SelectValue placeholder="Select a fruit" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="5">5</SelectItem>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="20">20</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
@@ -190,28 +227,37 @@ export function PersonalInfoTable({ data, itemsPerPage = 5 }: PersonalInfoTableP
               </Button>
 
               <div className="flex items-center gap-1">
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
-                  if (
-                    page === 1 ||
-                    page === totalPages ||
-                    (page >= currentPage - 1 && page <= currentPage + 1)
-                  ) {
-                    return (
-                      <Button
-                        key={page}
-                        variant={currentPage === page ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => goToPage(page)}
-                        className="h-9 w-9"
-                      >
-                        {page}
-                      </Button>
-                    );
-                  } else if (page === currentPage - 2 || page === currentPage + 2) {
-                    return <span key={page} className="px-1 text-slate-500">...</span>;
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (page) => {
+                    if (
+                      page === 1 ||
+                      page === totalPages ||
+                      (page >= currentPage - 1 && page <= currentPage + 1)
+                    ) {
+                      return (
+                        <Button
+                          key={page}
+                          variant={currentPage === page ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => goToPage(page)}
+                          className="h-9 w-9"
+                        >
+                          {page}
+                        </Button>
+                      );
+                    } else if (
+                      page === currentPage - 2 ||
+                      page === currentPage + 2
+                    ) {
+                      return (
+                        <span key={page} className="px-1 text-slate-500">
+                          ...
+                        </span>
+                      );
+                    }
+                    return null;
                   }
-                  return null;
-                })}
+                )}
               </div>
 
               <Button

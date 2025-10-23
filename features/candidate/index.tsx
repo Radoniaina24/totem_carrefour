@@ -1,9 +1,23 @@
+"use client";
 import { PersonalInfoTable } from "@/components/PersonalInfoTable";
 import { mockPersonalData } from "@/lib/mock-data";
+import { useGetAllCandidateQuery } from "@/redux/api/candidateApi";
 import { Users } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 
 export default function Candidate() {
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [itemsPerPage, setItemsPerPage] = useState<number>(2);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const queryParams = {
+    search: searchTerm,
+    page: currentPage,
+    limit: itemsPerPage,
+  };
+  const { data: candidates, isLoading } = useGetAllCandidateQuery(queryParams);
+  console.log(candidates);
+  const profisCandidate = candidates?.data;
+  console.log(profisCandidate);
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
@@ -25,10 +39,18 @@ export default function Candidate() {
         <div className="bg-white rounded-xl shadow-md p-6">
           <div className="mb-4 pb-4 border-b border-slate-200">
             <h2 className="text-lg font-semibold text-slate-800">
-              {mockPersonalData.length} Profil(s)
+              {candidates?.total} Profil(s)
             </h2>
           </div>
-          <PersonalInfoTable data={mockPersonalData} />
+          <PersonalInfoTable
+            data={profisCandidate}
+            itemsPerPage={itemsPerPage}
+            totalPages={candidates?.totalPages}
+            currentPage={currentPage}
+            onPageChange={setCurrentPage}
+            onItemsPerPageChange={setItemsPerPage}
+            loading={isLoading}
+          />
         </div>
       </div>
     </div>

@@ -6,28 +6,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { PersonalInfo, Experience, Education, Skill, Language } from "@/lib/schemas";
-import { Mail, Phone, MapPin, Briefcase, FileText, Building2, GraduationCap, Code, Languages } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { mockExperiences, mockEducation, mockSkills, mockLanguages } from "@/lib/mock-data";
+
+import { CVData } from "@/lib/types";
+import CVPreviewRecruteur from "./cv-builder/cv-preview-recruteur";
 
 interface PersonalInfoDialogProps {
-  person: PersonalInfo | null;
+  person: CVData | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
-
-const levelLabels = {
-  beginner: "Débutant",
-  intermediate: "Intermédiaire",
-  advanced: "Avancé",
-  expert: "Expert",
-  basic: "Basique",
-  conversational: "Conversationnel",
-  fluent: "Courant",
-  native: "Natif",
-};
 
 export function PersonalInfoDialog({
   person,
@@ -45,18 +32,18 @@ export function PersonalInfoDialog({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
+        {/* <div className="space-y-6 py-4">
           <div className="flex items-center space-x-4">
             <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-              {person.firstName.charAt(0)}
-              {person.lastName.charAt(0)}
+              {person.personalInfo.firstName.charAt(0)}
+              {person.personalInfo.lastName.charAt(0)}
             </div>
             <div>
               <h3 className="text-2xl font-bold">
-                {person.firstName} {person.lastName}
+                {person.personalInfo.firstName} {person.personalInfo.lastName}
               </h3>
               <Badge variant="secondary" className="mt-1">
-                {person.professionalTitle}
+                {person.personalInfo.professionalTitle}
               </Badge>
             </div>
           </div>
@@ -66,7 +53,9 @@ export function PersonalInfoDialog({
               <Mail className="w-5 h-5 text-blue-600 mt-0.5" />
               <div>
                 <p className="text-sm font-medium text-slate-600">Email</p>
-                <p className="text-sm text-slate-900">{person.email}</p>
+                <p className="text-sm text-slate-900">
+                  {person.personalInfo.email}
+                </p>
               </div>
             </div>
 
@@ -74,7 +63,9 @@ export function PersonalInfoDialog({
               <Phone className="w-5 h-5 text-blue-600 mt-0.5" />
               <div>
                 <p className="text-sm font-medium text-slate-600">Téléphone</p>
-                <p className="text-sm text-slate-900">{person.phone}</p>
+                <p className="text-sm text-slate-900">
+                  {person.personalInfo.phone}
+                </p>
               </div>
             </div>
 
@@ -82,11 +73,15 @@ export function PersonalInfoDialog({
               <MapPin className="w-5 h-5 text-blue-600 mt-0.5" />
               <div>
                 <p className="text-sm font-medium text-slate-600">Adresse</p>
-                <p className="text-sm text-slate-900">{person.address}</p>
                 <p className="text-sm text-slate-900">
-                  {person.zipCode} {person.city}
+                  {person.personalInfo.address}
                 </p>
-                <p className="text-sm text-slate-900">{person.country}</p>
+                <p className="text-sm text-slate-900">
+                  {person.personalInfo.zipCode} {person.personalInfo.city}
+                </p>
+                <p className="text-sm text-slate-900">
+                  {person.personalInfo.country}
+                </p>
               </div>
             </div>
 
@@ -97,7 +92,7 @@ export function PersonalInfoDialog({
                   Résumé Professionnel
                 </p>
                 <p className="text-sm text-slate-900 leading-relaxed">
-                  {person.profileSummary}
+                  {person.personalInfo.profileSummary}
                 </p>
               </div>
             </div>
@@ -108,27 +103,41 @@ export function PersonalInfoDialog({
           <div>
             <div className="flex items-center space-x-2 mb-4">
               <Building2 className="w-5 h-5 text-blue-600" />
-              <h3 className="text-lg font-bold text-slate-900">Expériences Professionnelles</h3>
+              <h3 className="text-lg font-bold text-slate-900">
+                Expériences Professionnelles
+              </h3>
             </div>
             <div className="space-y-4">
               {mockExperiences.map((exp, index) => (
-                <div key={index} className="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                <div
+                  key={index}
+                  className="p-4 bg-slate-50 rounded-lg border border-slate-200"
+                >
                   <div className="flex justify-between items-start mb-2">
                     <div>
-                      <h4 className="font-semibold text-slate-900">{exp.jobTitle}</h4>
+                      <h4 className="font-semibold text-slate-900">
+                        {exp.jobTitle}
+                      </h4>
                       <p className="text-sm text-slate-600">{exp.company}</p>
                     </div>
                     {exp.currentJob && (
-                      <Badge variant="default" className="bg-green-600">En cours</Badge>
+                      <Badge variant="default" className="bg-green-600">
+                        En cours
+                      </Badge>
                     )}
                   </div>
                   <div className="flex items-center space-x-2 text-sm text-slate-500 mb-2">
                     <MapPin className="w-3 h-3" />
                     <span>{exp.location}</span>
                     <span>•</span>
-                    <span>{exp.startDate} - {exp.currentJob ? "Présent" : exp.endDate}</span>
+                    <span>
+                      {exp.startDate} -{" "}
+                      {exp.currentJob ? "Présent" : exp.endDate}
+                    </span>
                   </div>
-                  <p className="text-sm text-slate-700 leading-relaxed">{exp.description}</p>
+                  <p className="text-sm text-slate-700 leading-relaxed">
+                    {exp.description}
+                  </p>
                 </div>
               ))}
             </div>
@@ -143,23 +152,37 @@ export function PersonalInfoDialog({
             </div>
             <div className="space-y-4">
               {mockEducation.map((edu, index) => (
-                <div key={index} className="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                <div
+                  key={index}
+                  className="p-4 bg-slate-50 rounded-lg border border-slate-200"
+                >
                   <div className="flex justify-between items-start mb-2">
                     <div>
-                      <h4 className="font-semibold text-slate-900">{edu.degree}</h4>
-                      <p className="text-sm text-slate-600">{edu.institution}</p>
+                      <h4 className="font-semibold text-slate-900">
+                        {edu.degree}
+                      </h4>
+                      <p className="text-sm text-slate-600">
+                        {edu.institution}
+                      </p>
                     </div>
                     {edu.currentStudy && (
-                      <Badge variant="default" className="bg-blue-600">En cours</Badge>
+                      <Badge variant="default" className="bg-blue-600">
+                        En cours
+                      </Badge>
                     )}
                   </div>
                   <div className="flex items-center space-x-2 text-sm text-slate-500 mb-2">
                     <MapPin className="w-3 h-3" />
                     <span>{edu.location}</span>
                     <span>•</span>
-                    <span>{edu.startDate} - {edu.currentStudy ? "Présent" : edu.endDate}</span>
+                    <span>
+                      {edu.startDate} -{" "}
+                      {edu.currentStudy ? "Présent" : edu.endDate}
+                    </span>
                   </div>
-                  <p className="text-sm text-slate-700 leading-relaxed">{edu.description}</p>
+                  <p className="text-sm text-slate-700 leading-relaxed">
+                    {edu.description}
+                  </p>
                 </div>
               ))}
             </div>
@@ -171,12 +194,19 @@ export function PersonalInfoDialog({
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <Code className="w-5 h-5 text-blue-600" />
-                <h3 className="text-lg font-bold text-slate-900">Compétences</h3>
+                <h3 className="text-lg font-bold text-slate-900">
+                  Compétences
+                </h3>
               </div>
               <div className="space-y-2">
                 {mockSkills.map((skill, index) => (
-                  <div key={index} className="flex justify-between items-center p-2 bg-slate-50 rounded">
-                    <span className="text-sm font-medium text-slate-900">{skill.name}</span>
+                  <div
+                    key={index}
+                    className="flex justify-between items-center p-2 bg-slate-50 rounded"
+                  >
+                    <span className="text-sm font-medium text-slate-900">
+                      {skill.name}
+                    </span>
                     <Badge variant="outline">{levelLabels[skill.level]}</Badge>
                   </div>
                 ))}
@@ -190,15 +220,29 @@ export function PersonalInfoDialog({
               </div>
               <div className="space-y-2">
                 {mockLanguages.map((lang, index) => (
-                  <div key={index} className="flex justify-between items-center p-2 bg-slate-50 rounded">
-                    <span className="text-sm font-medium text-slate-900">{lang.name}</span>
+                  <div
+                    key={index}
+                    className="flex justify-between items-center p-2 bg-slate-50 rounded"
+                  >
+                    <span className="text-sm font-medium text-slate-900">
+                      {lang.name}
+                    </span>
                     <Badge variant="outline">{levelLabels[lang.level]}</Badge>
                   </div>
                 ))}
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
+        <CVPreviewRecruteur
+          data={person}
+          onBack={function (): void {
+            throw new Error("Function not implemented.");
+          }}
+          onEdit={function (): void {
+            throw new Error("Function not implemented.");
+          }}
+        />
       </DialogContent>
     </Dialog>
   );
