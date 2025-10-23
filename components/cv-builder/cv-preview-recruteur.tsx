@@ -28,35 +28,6 @@ export default function CVPreviewRecruteur({
   onBack,
   onEdit,
 }: CVPreviewProps) {
-  const [addCvData] = useAddCandidateMutation();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const ErrorNotification = (msg: string) => toast.error(msg);
-  const SuccessNotification = (msg: string) => toast.success(msg);
-  const handleDownload = async (e: React.FormEvent) => {
-    try {
-      setIsLoading(true);
-      e.preventDefault();
-      const form = new FormData();
-      const photo = data.personalInfo.photo;
-      console.log(photo);
-      form.append("data", JSON.stringify(data));
-
-      if (photo) {
-        form.append("file", photo);
-      }
-
-      const res = await addCvData(form).unwrap();
-      SuccessNotification("CV envoyé avec success");
-      setIsLoading(false);
-    } catch (error: any) {
-      console.log(error);
-      ErrorNotification(error.data.message);
-    } finally {
-      setIsLoading(false);
-    }
-    // console.log(data);
-  };
-
   const skillLevelLabels = {
     beginner: "Débutant",
     intermediate: "Intermédiaire",
@@ -141,9 +112,9 @@ export default function CVPreviewRecruteur({
               Expérience Professionnelle
             </h2>
             <div className="space-y-6">
-              {data.experiences.map((exp) => (
+              {data.experiences.map((exp, index) => (
                 <div
-                  key={exp.id}
+                  key={index}
                   className="relative pl-6 border-l-2 border-gray-300"
                 >
                   <div className="absolute w-3 h-3 bg-blue-600 rounded-full -left-[7px] top-1.5"></div>
@@ -172,9 +143,9 @@ export default function CVPreviewRecruteur({
               Formation
             </h2>
             <div className="space-y-6">
-              {data.education.map((edu) => (
+              {data.education.map((edu, index) => (
                 <div
-                  key={edu.id}
+                  key={index}
                   className="relative pl-6 border-l-2 border-gray-300"
                 >
                   <div className="absolute w-3 h-3 bg-green-600 rounded-full -left-[7px] top-1.5"></div>
@@ -206,9 +177,9 @@ export default function CVPreviewRecruteur({
                 Compétences
               </h2>
               <div className="space-y-3">
-                {data.skills.map((skill) => (
+                {data.skills.map((skill, index) => (
                   <div
-                    key={skill.id}
+                    key={index}
                     className="flex items-center justify-between"
                   >
                     <span className="font-medium text-gray-900">
@@ -229,9 +200,9 @@ export default function CVPreviewRecruteur({
                   Langues
                 </h2>
                 <div className="space-y-3">
-                  {data.languages.map((language) => (
+                  {data.languages.map((language, index) => (
                     <div
-                      key={language.id}
+                      key={index}
                       className="flex items-center justify-between"
                     >
                       <span className="font-medium text-gray-900">

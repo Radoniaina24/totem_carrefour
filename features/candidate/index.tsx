@@ -1,13 +1,15 @@
 "use client";
 import { PersonalInfoTable } from "@/components/PersonalInfoTable";
+import { Input } from "@/components/ui/input";
+import { useCvEvents } from "@/hooks/useCvEvents";
 import { mockPersonalData } from "@/lib/mock-data";
 import { useGetAllCandidateQuery } from "@/redux/api/candidateApi";
-import { Users } from "lucide-react";
+import { Search, Users } from "lucide-react";
 import React, { useState } from "react";
 
 export default function Candidate() {
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [itemsPerPage, setItemsPerPage] = useState<number>(2);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const queryParams = {
     search: searchTerm,
@@ -15,9 +17,10 @@ export default function Candidate() {
     limit: itemsPerPage,
   };
   const { data: candidates, isLoading } = useGetAllCandidateQuery(queryParams);
-  console.log(candidates);
+  useCvEvents(queryParams);
+  // console.log(candidates);
   const profisCandidate = candidates?.data;
-  console.log(profisCandidate);
+  // console.log(profisCandidate);
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
@@ -37,11 +40,24 @@ export default function Candidate() {
         </div>
 
         <div className="bg-white rounded-xl shadow-md p-6">
-          <div className="mb-4 pb-4 border-b border-slate-200">
+          <div className="mb-4 pb-4 border-b border-slate-200 flex justify-between items-center">
             <h2 className="text-lg font-semibold text-slate-800">
               {candidates?.total} Profil(s)
             </h2>
+
+            <div className="">
+              <div className="relative w-full sm:w-96">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  placeholder="Rechercher par nom, email, titre..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
           </div>
+
           <PersonalInfoTable
             data={profisCandidate}
             itemsPerPage={itemsPerPage}
