@@ -16,6 +16,7 @@ import StepEducation from "@/components/cv-builder/step-education";
 import StepSkills from "@/components/cv-builder/step-skills";
 import CVPreview from "@/components/cv-builder/cv-preview";
 import { FileText } from "lucide-react";
+import { Toaster } from "react-hot-toast";
 
 const steps = [
   { number: 1, title: "Informations", description: "Données personnelles" },
@@ -71,6 +72,9 @@ export default function Home() {
   // console.log(cvData);
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <div>
+        <Toaster />
+      </div>
       <div className="container mx-auto px-4 py-8 max-w-5xl">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 text-white rounded-full mb-4">
@@ -128,6 +132,8 @@ export default function Home() {
               data={cvData}
               onBack={() => setCurrentStep(4)}
               onEdit={() => setCurrentStep(1)}
+              setCvData={setCvData}
+              setCurrentStep={setCurrentStep}
             />
           )}
         </div>

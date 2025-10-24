@@ -1,6 +1,6 @@
 "use client";
 
-import { CVData } from "@/lib/types";
+import { CVData, PersonalInfo } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import {
   Mail,
@@ -16,14 +16,34 @@ import {
 import { formatDate } from "./step-experience";
 import { useAddCandidateMutation } from "@/redux/api/candidateApi";
 import { useState } from "react";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 interface CVPreviewProps {
   data: CVData;
   onBack: () => void;
   onEdit: () => void;
+  setCvData: React.Dispatch<React.SetStateAction<CVData>>;
+  setCurrentStep: React.Dispatch<React.SetStateAction<number>>;
 }
-
-export default function CVPreview({ data, onBack, onEdit }: CVPreviewProps) {
+const initialPersonalInfo: PersonalInfo = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  phone: "",
+  address: "",
+  city: "",
+  zipCode: "",
+  country: "",
+  professionalTitle: "",
+  profileSummary: "",
+  photo: undefined,
+};
+export default function CVPreview({
+  data,
+  onBack,
+  onEdit,
+  setCvData,
+  setCurrentStep,
+}: CVPreviewProps) {
   const [addCvData] = useAddCandidateMutation();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const ErrorNotification = (msg: string) => toast.error(msg);
@@ -34,7 +54,7 @@ export default function CVPreview({ data, onBack, onEdit }: CVPreviewProps) {
       e.preventDefault();
       const form = new FormData();
       const photo = data.personalInfo.photo;
-      console.log(photo);
+      // console.log(photo);
       form.append("data", JSON.stringify(data));
 
       if (photo) {
@@ -44,6 +64,14 @@ export default function CVPreview({ data, onBack, onEdit }: CVPreviewProps) {
       const res = await addCvData(form).unwrap();
       SuccessNotification("CV envoyé avec success");
       setIsLoading(false);
+      setCvData({
+        personalInfo: initialPersonalInfo,
+        experiences: [],
+        education: [],
+        skills: [],
+        languages: [],
+      });
+      setCurrentStep(1);
     } catch (error: any) {
       console.log(error);
       ErrorNotification(error.data.message);
@@ -69,9 +97,6 @@ export default function CVPreview({ data, onBack, onEdit }: CVPreviewProps) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <Toaster />
-      </div>
       <div className="flex justify-between items-center mb-6 print:hidden">
         <h2 className="text-2xl font-bold text-gray-900">Aperçu de votre CV</h2>
         <div className="flex gap-3">
