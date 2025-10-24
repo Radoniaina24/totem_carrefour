@@ -2,7 +2,7 @@
 import { PersonalInfoTable } from "@/components/PersonalInfoTable";
 import { Input } from "@/components/ui/input";
 import { useCvEvents } from "@/hooks/useCvEvents";
-import { mockPersonalData } from "@/lib/mock-data";
+
 import { useGetAllCandidateQuery } from "@/redux/api/candidateApi";
 import { Search, Users } from "lucide-react";
 import React, { useState } from "react";

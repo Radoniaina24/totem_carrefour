@@ -58,7 +58,39 @@ export function PersonalInfoTable({
   const goToPage = (page: number) => {
     onPageChange(Math.max(1, Math.min(page, totalPages)));
   };
-  if (loading) return null;
+  if (loading)
+    return (
+      <div className="flex flex-col items-center justify-center py-12">
+        <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-gray-600 mt-3 text-sm font-medium">
+          Chargement en cours...
+        </p>
+      </div>
+    );
+
+  if (totalPages === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-8 bg-gray-50 rounded-xl border border-gray-200">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-8 h-8 text-gray-400 mb-2"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9.75 9.75h4.5m-2.25-2.25v4.5m9 0a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <p className="text-gray-600 text-center font-medium">
+          Aucun profil de candidat n&apos;a encore été enregistré.
+        </p>
+      </div>
+    );
+  }
   return (
     <>
       <div className="w-full">
