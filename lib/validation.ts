@@ -7,7 +7,7 @@ export const personalInfoSchema = z.object({
   phone: z.string().min(10, "Numéro de téléphone invalide"),
   address: z.string().min(5, "Adresse requise"),
   city: z.string().min(2, "Ville requise"),
-  zipCode: z.string().min(4, "Code postal requis"),
+  zipCode: z.string().min(2, "Code postal requis"),
   country: z.string().min(2, "Pays requis"),
   professionalTitle: z.string().min(3, "Titre professionnel requis"),
   profileSummary: z
