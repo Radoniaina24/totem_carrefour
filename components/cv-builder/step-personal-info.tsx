@@ -20,7 +20,9 @@ export default function StepPersonalInfo({
   data,
   onNext,
 }: StepPersonalInfoProps) {
-  const [photoPreview, setPhotoPreview] = useState<string | undefined>();
+  const [photoPreview, setPhotoPreview] = useState<string | undefined | File>(
+    data?.photo ? data.photo : ""
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
@@ -32,11 +34,12 @@ export default function StepPersonalInfo({
     resolver: zodResolver(personalInfoSchema),
     defaultValues: data,
   });
-
+  // console.log(errors);
+  // console.log(data?.photo);
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setValue("photo", file); // ✅ stocker le fichier
+      setValue("photo", file); // stocker le fichier
       const reader = new FileReader();
       reader.onloadend = () => setPhotoPreview(reader.result as string);
       reader.readAsDataURL(file);
@@ -61,7 +64,7 @@ export default function StepPersonalInfo({
           <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-100 border-4 border-gray-200">
             {photoPreview ? (
               <img
-                src={photoPreview}
+                src={photoPreview as string}
                 alt="Photo de profil"
                 className="w-full h-full object-cover"
               />

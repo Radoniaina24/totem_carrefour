@@ -1,3 +1,4 @@
+import AdminGuardRecruiter from "@/components/Auth/Guard/AuthGuardRecruiter";
 import Candidate from "@/features/candidate";
 import { Metadata } from "next";
 import React from "react";
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function CandidatePage() {
-  return <Candidate />;
+  return (
+    <AdminGuardRecruiter>
+      <Candidate />
+    </AdminGuardRecruiter>
+  );
 }

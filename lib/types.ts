@@ -9,7 +9,7 @@ export interface PersonalInfo {
   country: string;
   professionalTitle: string;
   profileSummary: string;
-  photo?: File;
+  photo?: string | undefined | File;
 }
 
 export interface Experience {
@@ -47,6 +47,7 @@ export interface Language {
 }
 
 export interface CVData {
+  _id?: string;
   personalInfo: PersonalInfo;
   experiences: Experience[];
   education: Education[];

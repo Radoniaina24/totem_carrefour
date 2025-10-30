@@ -15,8 +15,10 @@ export const personalInfoSchema = z.object({
     .min(50, "Le résumé doit contenir au moins 50 caractères")
     .max(500, "Maximum 500 caractères"),
   photo: z
-    .any()
-    .refine((file) => file instanceof File, "Une photo valide est requise")
+    .union([
+      z.instanceof(File), // pour un nouveau fichier
+      z.string().url().optional(), // pour une URL Cloudinary existante
+    ])
     .optional(),
 });
 
@@ -83,3 +85,50 @@ export const languageSchema = z.object({
     errorMap: () => ({ message: "Niveau requis" }),
   }),
 });
+
+export const registerSchema = z
+  .object({
+    firstName: z
+      .string()
+      .min(2, "Le prénom doit contenir au moins 2 caractères")
+      .max(50, "Le prénom ne peut pas dépasser 50 caractères")
+      .regex(
+        /^[a-zA-ZÀ-ÿ\s'-]+$/,
+        "Le prénom ne peut contenir que des lettres"
+      ),
+    lastName: z
+      .string()
+      .min(2, "Le nom doit contenir au moins 2 caractères")
+      .max(50, "Le nom ne peut pas dépasser 50 caractères")
+      .regex(/^[a-zA-ZÀ-ÿ\s'-]+$/, "Le nom ne peut contenir que des lettres"),
+    email: z
+      .string()
+      .email("Adresse email invalide")
+      .min(1, "L'email est requis"),
+    password: z
+      .string()
+      .min(8, "Le mot de passe doit contenir au moins 8 caractères")
+      .regex(/[A-Z]/, "Le mot de passe doit contenir au moins une majuscule")
+      .regex(/[a-z]/, "Le mot de passe doit contenir au moins une minuscule")
+      .regex(/[0-9]/, "Le mot de passe doit contenir au moins un chiffre")
+      .regex(
+        /[^A-Za-z0-9]/,
+        "Le mot de passe doit contenir au moins un caractère spécial"
+      ),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Les mots de passe ne correspondent pas",
+    path: ["confirmPassword"],
+  });
+
+export const loginSchema = z.object({
+  email: z
+    .string()
+    .email("Adresse email invalide")
+    .min(1, "L'email est requis"),
+  password: z.string().min(1, "Le mot de passe est requis"),
+});
+
+export type RegisterFormData = z.infer<typeof registerSchema>;
+export type LoginFormData = z.infer<typeof loginSchema>;

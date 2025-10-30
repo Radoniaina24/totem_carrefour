@@ -18,6 +18,7 @@ export default function Candidate() {
   };
   const { data: candidates, isLoading } = useGetAllCandidateQuery(queryParams);
   useCvEvents(queryParams);
+  console.log(candidates);
   // console.log(candidates);
   const profisCandidate = candidates?.data;
   // console.log(profisCandidate);

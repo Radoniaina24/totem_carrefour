@@ -19,6 +19,15 @@ export const candidateAPI = createApi({
       },
       providesTags: ["candidate"],
     }),
+    getMyCv: builder.query({
+      query: () => {
+        return {
+          url: `cv/myCv`,
+          method: "GET",
+        };
+      },
+      providesTags: ["candidate"],
+    }),
 
     addCandidate: builder.mutation({
       query: (values) => {
@@ -30,8 +39,22 @@ export const candidateAPI = createApi({
       },
       invalidatesTags: ["candidate"],
     }),
+    updateMyCv: builder.mutation({
+      query: ({ id, data }) => {
+        return {
+          url: `cv/updateMyCv/${id}`,
+          method: "PATCH",
+          body: data,
+        };
+      },
+      invalidatesTags: ["candidate"],
+    }),
   }),
 });
 
-export const { useAddCandidateMutation, useGetAllCandidateQuery } =
-  candidateAPI;
+export const {
+  useAddCandidateMutation,
+  useGetAllCandidateQuery,
+  useGetMyCvQuery,
+  useUpdateMyCvMutation,
+} = candidateAPI;

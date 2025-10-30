@@ -67,7 +67,7 @@ export function PersonalInfoTable({
         </p>
       </div>
     );
-
+  // console.log(totalPages);
   if (totalPages === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-8 bg-gray-50 rounded-xl border border-gray-200">
@@ -178,7 +178,7 @@ export function PersonalInfoTable({
         </div>
 
         <div className="lg:hidden space-y-4">
-          {data.map((person, index) => (
+          {data?.map((person, index) => (
             <div
               key={index}
               className="bg-white rounded-lg border border-slate-200 shadow-sm p-4 space-y-3"

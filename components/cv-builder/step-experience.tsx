@@ -9,8 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Trash2, Briefcase } from "lucide-react";
-import { useState } from "react";
+import { Plus, Trash2, Briefcase, Pencil } from "lucide-react";
+import { useState, useMemo } from "react";
+import toast from "react-hot-toast";
+import { v4 as uuidv4 } from "uuid";
 
 interface StepExperienceProps {
   data: Experience[];
@@ -21,14 +23,12 @@ interface StepExperienceProps {
 export const formatDate = (dateString: string) => {
   if (!dateString) return "";
   try {
-    // On ajoute "-01" si ce n’est qu’un "YYYY-MM" pour éviter une erreur
     const fullDate = dateString.length === 7 ? `${dateString}-01` : dateString;
     return new Date(fullDate).toLocaleDateString("fr-FR", {
       month: "long",
       year: "numeric",
     });
-  } catch (error) {
-    console.error("Erreur de formatage de date :", error);
+  } catch {
     return dateString;
   }
 };
@@ -38,9 +38,18 @@ export default function StepExperience({
   onNext,
   onBack,
 }: StepExperienceProps) {
-  const [experiences, setExperiences] = useState<Experience[]>(
-    data.length > 0 ? data : []
+  // ✅ Toujours avoir un ID unique, même si la BDD n'en fournit pas
+  const initialExperiences = useMemo(
+    () =>
+      data.map((exp) => ({
+        ...exp,
+        id: exp.id || uuidv4(),
+      })),
+    [data]
   );
+
+  const [experiences, setExperiences] =
+    useState<Experience[]>(initialExperiences);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
@@ -66,65 +75,85 @@ export default function StepExperience({
 
   const currentJob = watch("currentJob");
 
+  /** ✅ Création / mise à jour d’une expérience */
   const onSubmit = (formData: Omit<Experience, "id">) => {
     if (editingId) {
-      setExperiences(
-        experiences.map((exp) =>
-          exp.id === editingId ? { ...formData, id: editingId } : exp
+      // Modification
+      setExperiences((prev) =>
+        prev.map((exp) =>
+          exp.id === editingId ? { ...exp, ...formData } : exp
         )
       );
-      setEditingId(null);
+      toast.success("Expérience mise à jour avec succès !");
     } else {
-      setExperiences([
-        ...experiences,
-        { ...formData, id: Date.now().toString() },
-      ]);
+      // Création
+      setExperiences((prev) => [...prev, { ...formData, id: uuidv4() }]);
+      toast.success("Nouvelle expérience ajoutée !");
     }
+
     reset();
     setShowForm(false);
+    setEditingId(null);
   };
 
+  /** ✅ Édition */
   const handleEdit = (exp: Experience) => {
     setEditingId(exp.id);
-    setValue("jobTitle", exp.jobTitle);
-    setValue("company", exp.company);
-    setValue("location", exp.location);
-    setValue("startDate", exp.startDate);
-    setValue("endDate", exp.endDate);
-    setValue("currentJob", exp.currentJob);
-    setValue("description", exp.description);
+    Object.entries(exp).forEach(([key, value]) => {
+      if (key !== "id") setValue(key as keyof Omit<Experience, "id">, value);
+    });
     setShowForm(true);
   };
 
+  /** ✅ Suppression avec confirmation */
   const handleDelete = (id: string) => {
-    setExperiences(experiences.filter((exp) => exp.id !== id));
+    const exp = experiences.find((e) => e.id === id);
+    if (!exp) return;
+
+    const confirmed = window.confirm(
+      `Voulez-vous vraiment supprimer l'expérience "${exp.jobTitle}" chez ${exp.company} ?`
+    );
+
+    if (confirmed) {
+      setExperiences((prev) => prev.filter((e) => e.id !== id));
+      toast.success("Expérience supprimée avec succès !");
+    }
   };
 
+  /** ✅ Passage à l’étape suivante */
   const handleNext = () => {
     if (experiences.length === 0) {
-      alert("Veuillez ajouter au moins une expérience professionnelle");
+      toast.error("Veuillez ajouter au moins une expérience professionnelle");
       return;
     }
     onNext(experiences);
   };
 
+  /** ✅ Annuler et réinitialiser le formulaire */
+  const handleCancel = () => {
+    reset();
+    setShowForm(false);
+    setEditingId(null);
+  };
+
   return (
     <div className="space-y-6">
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+        <h2 className="text-2xl font-bold text-gray-900">
           Expérience Professionnelle
         </h2>
         <p className="text-gray-600">
-          Ajoutez vos expériences professionnelles
+          Ajoutez, modifiez ou supprimez vos expériences professionnelles.
         </p>
       </div>
 
+      {/* ✅ Liste des expériences */}
       {experiences.length > 0 && (
         <div className="space-y-4 mb-6">
           {experiences.map((exp) => (
             <div
               key={exp.id}
-              className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
+              className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-all"
             >
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-4 flex-1">
@@ -153,15 +182,16 @@ export default function StepExperience({
                     size="sm"
                     onClick={() => handleEdit(exp)}
                   >
-                    Modifier
+                    <Pencil className="w-4 h-4 mr-1" /> Modifier
                   </Button>
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
                     onClick={() => handleDelete(exp.id)}
+                    className="text-red-600 border-red-200 hover:bg-red-50"
                   >
-                    <Trash2 className="w-4 h-4 text-red-600" />
+                    <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
@@ -170,17 +200,8 @@ export default function StepExperience({
         </div>
       )}
 
-      {!showForm ? (
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full border-dashed border-2 py-8"
-          onClick={() => setShowForm(true)}
-        >
-          <Plus className="w-5 h-5 mr-2" />
-          Ajouter une expérience
-        </Button>
-      ) : (
+      {/* ✅ Formulaire d’ajout / édition */}
+      {showForm ? (
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="bg-gray-50 border border-gray-200 rounded-lg p-6 space-y-4"
@@ -195,7 +216,7 @@ export default function StepExperience({
               <Input
                 id="jobTitle"
                 {...register("jobTitle")}
-                className={errors.jobTitle ? "border-red-500" : ""}
+                className={errors.jobTitle && "border-red-500"}
               />
               {errors.jobTitle && (
                 <p className="text-red-500 text-sm mt-1">
@@ -209,7 +230,7 @@ export default function StepExperience({
               <Input
                 id="company"
                 {...register("company")}
-                className={errors.company ? "border-red-500" : ""}
+                className={errors.company && "border-red-500"}
               />
               {errors.company && (
                 <p className="text-red-500 text-sm mt-1">
@@ -223,7 +244,7 @@ export default function StepExperience({
               <Input
                 id="location"
                 {...register("location")}
-                className={errors.location ? "border-red-500" : ""}
+                className={errors.location && "border-red-500"}
               />
               {errors.location && (
                 <p className="text-red-500 text-sm mt-1">
@@ -238,7 +259,7 @@ export default function StepExperience({
                 id="startDate"
                 type="month"
                 {...register("startDate")}
-                className={errors.startDate ? "border-red-500" : ""}
+                className={errors.startDate && "border-red-500"}
               />
               {errors.startDate && (
                 <p className="text-red-500 text-sm mt-1">
@@ -254,7 +275,7 @@ export default function StepExperience({
                 type="month"
                 disabled={currentJob}
                 {...register("endDate")}
-                className={errors.endDate ? "border-red-500" : ""}
+                className={errors.endDate && "border-red-500"}
               />
               {errors.endDate && (
                 <p className="text-red-500 text-sm mt-1">
@@ -283,7 +304,7 @@ export default function StepExperience({
                 rows={4}
                 placeholder="Décrivez vos responsabilités, réalisations et compétences développées..."
                 {...register("description")}
-                className={errors.description ? "border-red-500" : ""}
+                className={errors.description && "border-red-500"}
               />
               {errors.description && (
                 <p className="text-red-500 text-sm mt-1">
@@ -297,19 +318,21 @@ export default function StepExperience({
             <Button type="submit" className="flex-1">
               {editingId ? "Mettre à jour" : "Ajouter"}
             </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                reset();
-                setShowForm(false);
-                setEditingId(null);
-              }}
-            >
+            <Button type="button" variant="outline" onClick={handleCancel}>
               Annuler
             </Button>
           </div>
         </form>
+      ) : (
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full border-dashed border-2 py-8"
+          onClick={() => setShowForm(true)}
+        >
+          <Plus className="w-5 h-5 mr-2" />
+          Ajouter une expérience
+        </Button>
       )}
 
       <div className="flex justify-between pt-6">

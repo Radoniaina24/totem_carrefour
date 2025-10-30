@@ -9,8 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Trash2, GraduationCap } from "lucide-react";
-import { useState } from "react";
+import { Plus, Trash2, GraduationCap, Pencil } from "lucide-react";
+import { useState, useMemo } from "react";
+import { v4 as uuidv4 } from "uuid";
+import toast from "react-hot-toast";
 import { formatDate } from "./step-experience";
 
 interface StepEducationProps {
@@ -24,9 +26,17 @@ export default function StepEducation({
   onNext,
   onBack,
 }: StepEducationProps) {
-  const [educations, setEducations] = useState<Education[]>(
-    data.length > 0 ? data : []
+  // ✅ Génère un ID unique même si la BDD n'en a pas
+  const initialEducations = useMemo(
+    () =>
+      data.map((edu) => ({
+        ...edu,
+        id: edu.id || uuidv4(),
+      })),
+    [data]
   );
+  // console.log(data);
+  const [educations, setEducations] = useState<Education[]>(initialEducations);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
@@ -52,61 +62,81 @@ export default function StepEducation({
 
   const currentStudy = watch("currentStudy");
 
+  /** ✅ Création ou mise à jour */
   const onSubmit = (formData: Omit<Education, "id">) => {
     if (editingId) {
-      setEducations(
-        educations.map((edu) =>
-          edu.id === editingId ? { ...formData, id: editingId } : edu
+      setEducations((prev) =>
+        prev.map((edu) =>
+          edu.id === editingId ? { ...edu, ...formData } : edu
         )
       );
-      setEditingId(null);
+      toast.success("Formation mise à jour avec succès !");
     } else {
-      setEducations([
-        ...educations,
-        { ...formData, id: Date.now().toString() },
-      ]);
+      setEducations((prev) => [...prev, { ...formData, id: uuidv4() }]);
+      toast.success("Nouvelle formation ajoutée !");
     }
+
     reset();
+    setEditingId(null);
     setShowForm(false);
   };
 
+  /** ✅ Édition */
   const handleEdit = (edu: Education) => {
     setEditingId(edu.id);
-    setValue("degree", edu.degree);
-    setValue("institution", edu.institution);
-    setValue("location", edu.location);
-    setValue("startDate", edu.startDate);
-    setValue("endDate", edu.endDate);
-    setValue("currentStudy", edu.currentStudy);
-    setValue("description", edu.description);
+    Object.entries(edu).forEach(([key, value]) => {
+      if (key !== "id") setValue(key as keyof Omit<Education, "id">, value);
+    });
     setShowForm(true);
   };
 
+  /** ✅ Suppression avec confirmation */
   const handleDelete = (id: string) => {
-    setEducations(educations.filter((edu) => edu.id !== id));
+    const edu = educations.find((e) => e.id === id);
+    if (!edu) return;
+
+    const confirmed = window.confirm(
+      `Voulez-vous vraiment supprimer la formation "${edu.degree}" à ${edu.institution} ?`
+    );
+
+    if (confirmed) {
+      setEducations((prev) => prev.filter((e) => e.id !== id));
+      toast.success("Formation supprimée avec succès !");
+    }
   };
 
+  /** ✅ Étape suivante */
   const handleNext = () => {
     if (educations.length === 0) {
-      alert("Veuillez ajouter au moins une formation");
+      toast.error("Veuillez ajouter au moins une formation.");
       return;
     }
     onNext(educations);
   };
 
+  /** ✅ Annuler */
+  const handleCancel = () => {
+    reset();
+    setShowForm(false);
+    setEditingId(null);
+  };
+
   return (
     <div className="space-y-6">
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Formation</h2>
-        <p className="text-gray-600">Ajoutez vos diplômes et formations</p>
+        <h2 className="text-2xl font-bold text-gray-900">Formation</h2>
+        <p className="text-gray-600">
+          Ajoutez, modifiez ou supprimez vos formations et diplômes.
+        </p>
       </div>
 
+      {/* ✅ Liste des formations */}
       {educations.length > 0 && (
         <div className="space-y-4 mb-6">
           {educations.map((edu) => (
             <div
               key={edu.id}
-              className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
+              className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-all"
             >
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-4 flex-1">
@@ -130,6 +160,7 @@ export default function StepEducation({
                     </p>
                   </div>
                 </div>
+
                 <div className="flex gap-2 ml-4">
                   <Button
                     type="button"
@@ -137,15 +168,16 @@ export default function StepEducation({
                     size="sm"
                     onClick={() => handleEdit(edu)}
                   >
-                    Modifier
+                    <Pencil className="w-4 h-4 mr-1" /> Modifier
                   </Button>
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
                     onClick={() => handleDelete(edu.id)}
+                    className="text-red-600 border-red-200 hover:bg-red-50"
                   >
-                    <Trash2 className="w-4 h-4 text-red-600" />
+                    <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
@@ -154,17 +186,8 @@ export default function StepEducation({
         </div>
       )}
 
-      {!showForm ? (
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full border-dashed border-2 py-8"
-          onClick={() => setShowForm(true)}
-        >
-          <Plus className="w-5 h-5 mr-2" />
-          Ajouter une formation
-        </Button>
-      ) : (
+      {/* ✅ Formulaire */}
+      {showForm ? (
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="bg-gray-50 border border-gray-200 rounded-lg p-6 space-y-4"
@@ -222,6 +245,7 @@ export default function StepEducation({
               <Input
                 id="startDate"
                 type="month"
+                // defaultValue={data?.startData ?? data?.startDate ?? ""}
                 {...register("startDate")}
                 className={errors.startDate ? "border-red-500" : ""}
               />
@@ -284,19 +308,21 @@ export default function StepEducation({
             <Button type="submit" className="flex-1">
               {editingId ? "Mettre à jour" : "Ajouter"}
             </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                reset();
-                setShowForm(false);
-                setEditingId(null);
-              }}
-            >
+            <Button type="button" variant="outline" onClick={handleCancel}>
               Annuler
             </Button>
           </div>
         </form>
+      ) : (
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full border-dashed border-2 py-8"
+          onClick={() => setShowForm(true)}
+        >
+          <Plus className="w-5 h-5 mr-2" />
+          Ajouter une formation
+        </Button>
       )}
 
       <div className="flex justify-between pt-6">
