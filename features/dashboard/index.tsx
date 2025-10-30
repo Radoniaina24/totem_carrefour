@@ -226,7 +226,7 @@ function DashboardContent() {
                 ) : (
                   <Button
                     onClick={() => router.push("/curriculum-vitae")}
-                    className="bg-slate-900 hover:bg-slate-800"
+                    className="bg-blue-600 hover:bg-blue-700 text-white transition"
                   >
                     <Plus className="mr-2 h-4 w-4" />
                     Nouveau CV
