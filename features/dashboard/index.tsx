@@ -223,6 +223,8 @@ function DashboardContent() {
                 </div>
                 {cv ? (
                   ""
+                ) : isLoading ? (
+                  ""
                 ) : (
                   <Button
                     onClick={() => router.push("/curriculum-vitae")}
