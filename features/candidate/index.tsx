@@ -5,7 +5,7 @@ import { useCvEvents } from "@/hooks/useCvEvents";
 
 import { useGetAllCandidateQuery } from "@/redux/api/candidateApi";
 import { Search, Users } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 export default function Candidate() {
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -16,6 +16,10 @@ export default function Candidate() {
     page: currentPage,
     limit: itemsPerPage,
   };
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
   const { data: candidates, isLoading } = useGetAllCandidateQuery(queryParams);
   useCvEvents(queryParams);
   console.log(candidates);
